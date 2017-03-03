@@ -1,0 +1,28 @@
+{
+    "author": "webmaster@rickadams.org",
+    "dependencies": {},
+    "keywords": [],
+    "name": "rpilights",
+    "pebble": {
+        "displayName": "RPILIGHTS controller",
+        "enableMultiJS": true,
+        "messageKeys": {
+            "KEY_REQUEST": 0,
+            "KEY_RESPONSE": 1
+        },
+        "projectType": "native",
+        "resources": {
+            "media": []
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt"
+        ],
+        "uuid": "0cdaa6c6-ffe1-4d3f-98d3-76b7cdf6794a",
+        "watchapp": {
+            "watchface": false
+        }
+    },
+    "version": "1.0.0"
+}
