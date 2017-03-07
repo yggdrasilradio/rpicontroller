@@ -11,7 +11,7 @@ var xhrRequest = function (url, type, callback) {
 function getWebdata(message) {
 
         // Construct URL
-        var url = "http://yggdrasilradio.com/rpilights.php?id=" + message;
+        var url = "http://example.com/rpilights.php?id=" + message;
 
         // Send web request
 		console.log(url);
