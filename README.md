@@ -1,2 +1,3 @@
 # rpicontroller
-Pebble App to Control Rpi Lights
+
+Pebble Watch App to Control Rpi Lights
