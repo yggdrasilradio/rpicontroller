@@ -6,9 +6,9 @@ shell_exec("/usr/local/bin/rpilights $id > /dev/null 2>/dev/null");
 
 $status = shell_exec("/usr/local/bin/rpilights status");
 
-$command = file_get_contents("/home/pi/rpilights/.command");
-
 $status =  str_replace(array("\r", "\n"), '', $status);
+
+$command = file_get_contents("/home/pi/rpilights/.command");
 
 $command =  str_replace(array("\r", "\n"), '', $command);
 
