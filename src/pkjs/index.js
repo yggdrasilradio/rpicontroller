@@ -12,7 +12,11 @@ var xhrRequest = function (url, type, callback) {
 function getWebdata(message) {
 
         // Construct URL
+<<<<<<< HEAD
         var url = "http://example.com/rpilights.php?id=" + message;
+=======
+        var url = "http:/example.com/rpilights.php?id=" + message;
+>>>>>>> f260829035f234983d7d5a540cd9c9c03b864128
 
         // Send web request
 	console.log(url);

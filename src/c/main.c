@@ -5,42 +5,35 @@
 
 static Window *window;
 static MenuLayer *menu_layer;
+static TextLayer *text_layer;
 static char response[128];
 
 static uint16_t menu_get_num_sections_callback(MenuLayer *menu_layer, void *data) {
 
+        // One menu section
 	return 1;
 }
 
 static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
 
-	switch (section_index) {
-		case 0:
-			return 6;
-		default:
-			return 0;
-	}
+        // Six menu items
+	return 6;
 }
 
 static int16_t menu_get_header_height_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
 
-	return MENU_CELL_BASIC_HEADER_HEIGHT;
+        // No header
+	return 0;
 }
 
 static void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t section_index, void *data) {
 
-	switch (section_index) {
-		case 0:
-			if (strlen(response) == 0)
-				menu_cell_basic_header_draw(ctx, cell_layer, "RPILIGHTS");
-			else
-				menu_cell_basic_header_draw(ctx, cell_layer, response);
-			break;
-	}
+        // No header
 }
 
 static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
 
+        // Menu items
 	switch (cell_index->section) {
 		case 0:
 			switch (cell_index->row) {
@@ -62,21 +55,14 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
 				case 5: 
 					menu_cell_basic_draw(ctx, cell_layer, "Snow", "Snow animation", NULL);
 					break;
-		}
-		break;
+			}
+			break;
 	}
-}
-
-static void SendRequest(char *data) {
-
-	DictionaryIterator *iter1;
-	app_message_outbox_begin(&iter1);
-	dict_write_cstring(iter1, KEY_REQUEST, data);
-	app_message_outbox_send();
 }
 
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
 	
+        // Menu selection
 	switch (cell_index->row) {
 		case 0:
 			SendRequest("on");
@@ -99,15 +85,26 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
 	}
 }
 
+
+static void SendRequest(char *data) {
+
+        // Send request from watch to phone
+	DictionaryIterator *iter1;
+	app_message_outbox_begin(&iter1);
+	dict_write_cstring(iter1, KEY_REQUEST, data);
+	app_message_outbox_send();
+}
+
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
 
+        // Receive response from phone to watch
 	Tuple *t = dict_read_first(iterator);
 	while (t != NULL) {
 
 		switch(t->key) {
 			case KEY_RESPONSE:
 				snprintf(response, sizeof(response), "%s", t->value->cstring);
-				layer_mark_dirty(menu_layer_get_layer(menu_layer));
+				text_layer_set_text(text_layer, response);
 				APP_LOG(APP_LOG_LEVEL_DEBUG, "Received: %s", response);
 				break;
 		}
@@ -119,6 +116,8 @@ static void window_load(Window *window) {
 	
 	Layer *window_layer = window_get_root_layer(window);
 	GRect bounds = layer_get_bounds(window_layer);
+	bounds.origin.y += MENU_CELL_BASIC_HEADER_HEIGHT;
+	bounds.size.h -= MENU_CELL_BASIC_HEADER_HEIGHT;
 	menu_layer = menu_layer_create(bounds);
 	menu_layer_set_callbacks(menu_layer, NULL, (MenuLayerCallbacks) {
 		.get_num_sections = menu_get_num_sections_callback,
@@ -128,11 +127,18 @@ static void window_load(Window *window) {
 		.draw_row = menu_draw_row_callback,
 		.select_click = menu_select_callback,
 	});
+	bounds = layer_get_bounds(window_layer);
+	bounds.size.h = MENU_CELL_BASIC_HEADER_HEIGHT;
+	text_layer = text_layer_create(bounds);
+	text_layer_set_text_color(text_layer, GColorFromRGB(255, 255, 255));
+	text_layer_set_background_color(text_layer, GColorFromRGB(0, 0, 255));
 #ifdef PBL_COLOR
 	menu_layer_set_highlight_colors(menu_layer, GColorFromRGB(0, 255, 255), GColorFromRGB(0, 0, 0));
 #endif
 	menu_layer_set_click_config_onto_window(menu_layer, window);
+	text_layer_set_text(text_layer, "RPILIGHTS");
 	layer_add_child(window_layer, menu_layer_get_layer(menu_layer));
+	layer_add_child(window_layer, text_layer_get_layer(text_layer));
 }
 
 static void window_unload(Window *window) {
