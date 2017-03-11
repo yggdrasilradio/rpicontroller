@@ -10,38 +10,30 @@ static char response[128];
 
 static uint16_t menu_get_num_sections_callback(MenuLayer *menu_layer, void *data) {
 
+        // One menu section
 	return 1;
 }
 
 static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
 
-	switch (section_index) {
-		case 0:
-			return 6;
-		default:
-			return 0;
-	}
+        // Six menu items
+	return 6;
 }
 
 static int16_t menu_get_header_height_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
 
+        // No header
 	return 0;
 }
 
 static void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t section_index, void *data) {
 
-	//switch (section_index) {
-		//case 0:
-			//if (strlen(response) == 0)
-				//menu_cell_basic_header_draw(ctx, cell_layer, "RPILIGHTS");
-			//else
-				//menu_cell_basic_header_draw(ctx, cell_layer, response);
-			//break;
-	//}
+        // No header
 }
 
 static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
 
+        // Menu items
 	switch (cell_index->section) {
 		case 0:
 			switch (cell_index->row) {
@@ -68,16 +60,9 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
 	}
 }
 
-static void SendRequest(char *data) {
-
-	DictionaryIterator *iter1;
-	app_message_outbox_begin(&iter1);
-	dict_write_cstring(iter1, KEY_REQUEST, data);
-	app_message_outbox_send();
-}
-
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
 	
+        // Menu selection
 	switch (cell_index->row) {
 		case 0:
 			SendRequest("on");
@@ -100,8 +85,19 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
 	}
 }
 
+
+static void SendRequest(char *data) {
+
+        // Send request from watch to phone
+	DictionaryIterator *iter1;
+	app_message_outbox_begin(&iter1);
+	dict_write_cstring(iter1, KEY_REQUEST, data);
+	app_message_outbox_send();
+}
+
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
 
+        // Receive response from phone to watch
 	Tuple *t = dict_read_first(iterator);
 	while (t != NULL) {
 
@@ -136,7 +132,6 @@ static void window_load(Window *window) {
 	text_layer = text_layer_create(bounds);
 	text_layer_set_text_color(text_layer, GColorFromRGB(255, 255, 255));
 	text_layer_set_background_color(text_layer, GColorFromRGB(0, 0, 255));
-	
 #ifdef PBL_COLOR
 	menu_layer_set_highlight_colors(menu_layer, GColorFromRGB(0, 255, 255), GColorFromRGB(0, 0, 0));
 #endif
